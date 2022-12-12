@@ -70,3 +70,9 @@ $$ c_{00} = c_{11} = 0, c_{01} = 1, c_{10} = IR, $$
 --------
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
+
+# 3. Начальное заполение данных
+
+```shell
+python src/data/initiate.py
+```
