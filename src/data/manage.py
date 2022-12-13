@@ -17,7 +17,7 @@ from src.emulator import generate_dataset, add_frauds, generate_transactions_tab
 @click.option('--radius', type=int, default=5)
 def create(n_customers=5000, n_terminals=10000, nb_days=30, start_date=dt.date(year=2022, month=1, day=1), radius=10):
 
-    print(date)
+    print(start_date)
     customer_profiles_table_df, terminal_profiles_table_df, transactions_df = \
         generate_dataset(
             n_customers=n_customers, 
