@@ -75,7 +75,7 @@ $$ c_{00} = c_{11} = 0, c_{01} = 1, c_{10} = IR, $$
 
 Создать датасет
 ```shell
-python src/data/manage.py create --n-customers=2000000 --n-terminals=50000 --start-date=2022-01-01 --nb-days=5 --radius=30
+python src/data/manage.py create --n-customers=200000 --n-terminals=50000 --start-date=2022-01-01 --nb-days=5 --radius=10
 ```
 
 Удалить датасет
