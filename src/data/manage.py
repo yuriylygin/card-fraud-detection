@@ -7,7 +7,7 @@ import pyspark
 import datetime as dt
 import click
 
-from src.emulator import generate_dataset, add_frauds
+from src.emulator import generate_dataset, add_frauds, generate_transactions_table
 
 @click.command()
 @click.option('--n-customers', type=int, default=5000)
@@ -15,7 +15,7 @@ from src.emulator import generate_dataset, add_frauds
 @click.option('--nb-days', type=int, default=250)
 @click.option('--start-date', type=click.DateTime(formats=["%Y-%m-%d"]), default=str(dt.date(year=2021, month=1, day=1)))
 @click.option('--radius', type=int, default=5)
-def create(n_customers=5000, n_terminals=10000, nb_days=250, start_date=dt.date(year=2021, month=1, day=1), radius=5):
+def create(n_customers=5000, n_terminals=10000, nb_days=30, start_date=dt.date(year=2022, month=1, day=1), radius=10):
 
     customer_profiles_table_df, terminal_profiles_table_df, transactions_df = \
         generate_dataset(
@@ -25,6 +25,8 @@ def create(n_customers=5000, n_terminals=10000, nb_days=250, start_date=dt.date(
             start_date=start_date, 
             r=radius,
         )
+
+    transactions_df = add_frauds(customer_profiles_table_df, terminal_profiles_table_df, transactions_df)
         
     spark = (
         pyspark.sql.SparkSession.builder
@@ -34,9 +36,6 @@ def create(n_customers=5000, n_terminals=10000, nb_days=250, start_date=dt.date(
             .config("spark.driver.memory", "1g")
             .getOrCreate()
     )
-
-    customer_profiles_table_df, terminal_profiles_table_df, transactions_df = create()
-    transactions_df = add_frauds(customer_profiles_table_df, terminal_profiles_table_df, transactions_df)
 
     transactions_sdf=spark.createDataFrame(transactions_df)
     customer_profiles_table_sdf=spark.createDataFrame(customer_profiles_table_df)
@@ -71,17 +70,16 @@ def delete():
 @click.option('--nb-days', type=int, default=250)
 @click.option('--start-date', type=click.DateTime(formats=["%Y-%m-%d"]), default=str(dt.date(year=2021, month=1, day=1)))
 @click.option('--radius', type=int, default=5)
-def update(nb_days=250, start_date=dt.date(year=2021, month=1, day=1), radius=5):
+def update(nb_days=30, start_date=dt.date(year=2022, month=2, day=1), radius=5):
 
     spark = (
         pyspark.sql.SparkSession.builder
-            .appName("create")
+            .appName("update")
             .master("yarn")
             .config("spark.executor.memory", "1g")
             .config("spark.driver.memory", "1g")
             .getOrCreate()
     )
-
     customer_profiles_table_sdf = (
         spark.read
         .format("parquet")
@@ -98,7 +96,6 @@ def update(nb_days=250, start_date=dt.date(year=2021, month=1, day=1), radius=5)
     )
     customer_profiles_table_df = customer_profiles_table_sdf.toPandas()
     terminal_profiles_table_df = terminal_profiles_table_sdf.toPandas()
-
     transactions_df = (
         customer_profiles_table_df
             .groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], start_date=start_date,  nb_days=nb_days)).reset_index(drop=True)
@@ -117,6 +114,7 @@ def cli():
 
 cli.add_command(create)
 cli.add_command(delete)
+cli.add_command(update)
 
 
 if __name__ == '__main__':
