@@ -71,8 +71,14 @@ $$ c_{00} = c_{11} = 0, c_{01} = 1, c_{10} = IR, $$
 
 <p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
 
-# 3. Начальное заполение данных
+# 3. Работат с датасетом
 
+Создать датасет
 ```shell
-python src/data/initiate.py
+python src/data/manage.py create --n-customers=2000000 --n-terminals=50000 --start-date=2022-01-01 --nb-days=5 --radius=30
+```
+
+Удалить датасет
+```shell
+python src/data/manage.py delete
 ```
