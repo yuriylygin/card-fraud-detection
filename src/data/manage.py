@@ -45,6 +45,15 @@ def create(n_customers=5000, n_terminals=10000, nb_days=30, start_date=dt.date(y
     customer_profiles_table_sdf.write.mode("append").parquet("hdfs:///user/otus/card-fraud-detection/customer_profiles_table.parquet")
     terminal_profiles_table_sdf.write.mode("append").parquet("hdfs:///user/otus/card-fraud-detection/terminal_profiles_table.parquet") 
 
+    for day in range(nb_days - 1):
+        transactions_df = (
+            customer_profiles_table_df
+                .groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], start_date=start_date+dt.timedelta(days=day),  nb_days=1)).reset_index(drop=True)
+        )
+        transactions_df = add_frauds(customer_profiles_table_df, terminal_profiles_table_df, transactions_df)
+        transactions_sdf=spark.createDataFrame(transactions_df)
+        transactions_sdf.write.mode("append").parquet("hdfs:///user/otus/card-fraud-detection/transactions.parquet")
+
     spark.stop()
 
 @click.command()
@@ -96,13 +105,17 @@ def update(nb_days=30, start_date=dt.date(year=2022, month=2, day=1), radius=5):
     )
     customer_profiles_table_df = customer_profiles_table_sdf.toPandas()
     terminal_profiles_table_df = terminal_profiles_table_sdf.toPandas()
-    transactions_df = (
-        customer_profiles_table_df
-            .groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], start_date=start_date,  nb_days=nb_days)).reset_index(drop=True)
-    )
-    transactions_df = add_frauds(customer_profiles_table_df, terminal_profiles_table_df, transactions_df)
-    transactions_sdf = spark.createDataFrame(transactions_df) 
-    transactions_sdf.write.mode("append").parquet("hdfs:///user/otus/card-fraud-detection/transactions.parquet")
+    
+    for day in range(nb_days):
+        transactions_df = (
+            customer_profiles_table_df
+                .groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], start_date=start_date+dt.timedelta(days=day),  nb_days=1)).reset_index(drop=True)
+        )
+        transactions_df = add_frauds(customer_profiles_table_df, terminal_profiles_table_df, transactions_df)
+        transactions_sdf = spark.createDataFrame(transactions_df) 
+        transactions_sdf.write.mode("append").parquet("hdfs:///user/otus/card-fraud-detection/transactions.parquet")
+
+    spark.stop()
 
 
 @click.group()
