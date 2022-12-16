@@ -1,3 +1,6 @@
+from pandarallel import pandarallel
+pandarallel.initialize(progress_bar=False)
+
 import numpy as np
 import pandas as pd
 import random
@@ -138,16 +141,16 @@ def generate_dataset(n_customers = 10000, n_terminals = 1000000, nb_days=90, sta
     
     start_time=time.time()
     x_y_terminals = terminal_profiles_table[['x_terminal_id','y_terminal_id']].values.astype(float)
-    customer_profiles_table['available_terminals'] = customer_profiles_table.apply(lambda x : get_list_terminals_within_radius(x, x_y_terminals=x_y_terminals, r=r), axis=1)
+    # customer_profiles_table['available_terminals'] = customer_profiles_table.apply(lambda x : get_list_terminals_within_radius(x, x_y_terminals=x_y_terminals, r=r), axis=1)
     # With Pandarallel
-    #customer_profiles_table['available_terminals'] = customer_profiles_table.parallel_apply(lambda x : get_list_closest_terminals(x, x_y_terminals=x_y_terminals, r=r), axis=1)
+    customer_profiles_table['available_terminals'] = customer_profiles_table.parallel_apply(lambda x : get_list_closest_terminals(x, x_y_terminals=x_y_terminals, r=r), axis=1)
     customer_profiles_table['nb_terminals']=customer_profiles_table.available_terminals.apply(len)
     print("Time to associate terminals to customers: {0:.2}s".format(time.time()-start_time))
     
     start_time=time.time()
-    transactions_df=customer_profiles_table.groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], nb_days=nb_days)).reset_index(drop=True)
+    # transactions_df=customer_profiles_table.groupby('CUSTOMER_ID').apply(lambda x : generate_transactions_table(x.iloc[0], nb_days=nb_days)).reset_index(drop=True)
     # With Pandarallel
-    #transactions_df=customer_profiles_table.groupby('CUSTOMER_ID').parallel_apply(lambda x : generate_transactions_table(x.iloc[0], nb_days=nb_days)).reset_index(drop=True)
+    transactions_df=customer_profiles_table.groupby('CUSTOMER_ID').parallel_apply(lambda x : generate_transactions_table(x.iloc[0], nb_days=nb_days)).reset_index(drop=True)
     print("Time to generate transactions: {0:.2}s".format(time.time()-start_time))
     
     # Sort transactions chronologically
