@@ -124,4 +124,4 @@ cli.add_command(update)
 
 if __name__ == '__main__':
     cli()
-
+    # create(n_customers=5000, n_terminals=10000, nb_days=30, start_date=dt.date(year=2022, month=1, day=1), radius=10)
