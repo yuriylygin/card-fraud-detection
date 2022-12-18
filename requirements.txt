@@ -16,3 +16,4 @@ fastparquet
 pyarrow
 findspark
 pandarallel
+apache-airflow[yandexcloud]
