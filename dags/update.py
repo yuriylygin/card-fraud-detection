@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 import uuid
-from datetime import datetime
+import datetime as dt
 
 from airflow import DAG
 from airflow.providers.yandex.operators.yandexcloud_dataproc import (
@@ -22,7 +22,7 @@ with DAG(
     dag_id="update-dataset",
     default_args=args,
     schedule_interval="@once",
-    start_date=datetime(2021, 1, 1),
+    start_date=dt.datetime(2021, 1, 1),
     tags=["API"],
 ) as dag:
     create_pyspark_job = DataprocCreatePysparkJobOperator(
@@ -36,9 +36,9 @@ with DAG(
         # file_uris=[
         #     "s3a://data-proc-public/jobs/sources/data/config.json",
         # ],
-        # archive_uris=[
-        #     "s3a://data-proc-public/jobs/sources/data/country-codes.csv.zip",
-        # ],
+        archive_uris=[
+            "s3a://yl-otus/venv.zip",
+        ],
         # args=[
         #     "s3a://data-proc-public/jobs/sources/data/cities500.txt.bz2",
         #     f"s3a://{S3_BUCKET_NAME_FOR_JOB_LOGS}/dataproc/job/results/${{JOB_ID}}",
@@ -48,9 +48,9 @@ with DAG(
         #     "s3a://data-proc-public/jobs/sources/java/icu4j-61.1.jar",
         #     "s3a://data-proc-public/jobs/sources/java/commons-lang-2.6.jar",
         # ],
-        # properties={
-        #     "spark.submit.deployMode": "cluster",
-        # },
+        properties={
+            "spark.submit.deployMode": "cluster",
+        },
         # packages=["org.slf4j:slf4j-simple:1.7.30"],
         # repositories=["https://repo1.maven.org/maven2"],
         # exclude_packages=["com.amazonaws:amazon-kinesis-client"],

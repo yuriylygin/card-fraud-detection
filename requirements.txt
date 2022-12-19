@@ -1,5 +1,5 @@
 # local package
--e .
+# -e .
 
 # external requirements
 click
@@ -17,3 +17,5 @@ pyarrow
 findspark
 pandarallel
 apache-airflow[yandexcloud]
+apache-airflow-providers-yandex
+venv-pack

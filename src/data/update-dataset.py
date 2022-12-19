@@ -1,4 +1,15 @@
-def update():
-    print("update")
+import sys
+from pyspark import SparkConf, SparkContext
 
-update
+from src.data.manage import update
+
+
+def main():
+    conf = SparkConf().setAppName("Update dataset - PySpark")
+    sc = SparkContext(conf=conf)
+    
+    print("-------------======= UPDATE =======-------------")
+
+
+if __name__ == "__main__":
+    main()

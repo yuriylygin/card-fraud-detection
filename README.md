@@ -87,3 +87,18 @@ python src/data/manage.py update --start-date=2022-02-01 --nb-days=25 --radius=5
 ```shell
 python src/data/manage.py delete
 ```
+
+```shell
+venv-pack -o venv.tar.gz
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+PYSPARK_PYTHON=${PYTHON_VENV}
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV}\
+--num-executors 5 --executor-cores 5 \
+--driver-memory 8g --executor-memory 16g \
+--archives ./venv.tar.gz#environment \
+start.py
+```
