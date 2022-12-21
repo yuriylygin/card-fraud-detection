@@ -99,6 +99,26 @@ spark-submit --master yarn --deploy-mode cluster \
 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV}\
 --num-executors 5 --executor-cores 5 \
 --driver-memory 8g --executor-memory 16g \
---archives ./venv.tar.gz#environment \
-start.py
+--archives ./venv.tar.gz#venv \
+src/data/update-dataset.py
+```
+
+```shell
+yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
+--name=yc-manual-launch \
+--main-python-file-uri=s3a://yl-otus/yandex-example.py \
+--archive-uris=s3a://yl-otus/venv.tar.gz#venv \
+--properties=spark.yarn.appMasterEnv.PYSPARK_PYTHON=./venv/bin/python \
+--properties=spark.submit.deployMode=cluster
+```
+
+```shell
+yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
+--name=yc-manual-launch \
+--main-python-file-uri=./card-fraud-detection.tar.gz/card-fraud-detection/src/data/yandex-example.py \
+--args=s3a://yl-otus/yandex-data.txt --args=s3a://yl-otus/output \
+--archive-uris=s3a://yl-otus/venv.tar.gz#venv \
+--archive-uris=s3a://yl-otus/card-fraud-detection.tar.gz \
+--properties=spark.yarn.appMasterEnv.PYSPARK_PYTHON=venv/bin/python \
+--properties=spark.submit.deployMode=client
 ```
