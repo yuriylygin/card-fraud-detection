@@ -113,22 +113,29 @@ src/data/update-dataset.py
 ```
 
 ```shell
-yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
---name=yc-manual-launch \
---main-python-file-uri=s3a://yl-otus/yandex-example.py \
---args=s3a://yl-otus/yandex-data.txt --args=s3a://yl-otus/output \
---archive-uris=s3a://yl-otus/venv.tar.gz#venv \
---properties=spark.yarn.appMasterEnv.PYSPARK_PYTHON=./venv/bin/python \
---properties=spark.submit.deployMode=cluster
+yc dataproc job create-pyspark --cluster-id c9q1ee8pnj1r46ogk49s \
+--name yc-manual-launch \
+--main-python-file-uri s3a://yl-otus/yandex-example.py \
+--args s3a://yl-otus/yandex-data.txt --args=s3a://yl-otus/output \
+--archive-uris s3a://yl-otus/venv.tar.gz#venv \
+--properties spark.yarn.appMasterEnv.PYSPARK_PYTHON=./venv/bin/python \
+--properties spark.executorEnv.PYSPARK_PYTHON=./venv/bin/python \
+--properties spark.submit.deployMode=cluster \
+--properties spark-env:PYSPARK_PYTHON=./venv/bin/python \
+--properties hadoop-env:PYSPARK_PYTHON=./venv/bin/python
 ```
 
 ```shell
 yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
 --name=yc-manual-launch \
---main-python-file-uri=./card-fraud-detection.tar.gz/card-fraud-detection/src/data/yandex-example.py \
---args=s3a://yl-otus/yandex-data.txt --args=s3a://yl-otus/output \
---archive-uris=s3a://yl-otus/venv.tar.gz#venv \
---archive-uris=s3a://yl-otus/card-fraud-detection.tar.gz \
---properties=spark.yarn.appMasterEnv.PYSPARK_PYTHON=venv/bin/python \
---properties=spark.submit.deployMode=client
+--main-python-file-uri ./card-fraud-detection.tar.gz/card-fraud-detection/src/data/yandex-example.py \
+--args s3a://yl-otus/yandex-data.txt --args s3a://yl-otus/output \
+--archive-uris s3a://yl-otus/venv.tar.gz#venv \
+--archive-uris s3a://yl-otus/card-fraud-detection.tar.gz \
+--properties spark.yarn.appMasterEnv.PYSPARK_PYTHON=venv/bin/python \
+--properties spark.submit.deployMode=client
+```
+
+```shell
+yc dataproc job log --cluster-id=c9q1ee8pnj1r46ogk49s c9qslupu9ch0v2u33lrb
 ```
