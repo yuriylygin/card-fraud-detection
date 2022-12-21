@@ -94,7 +94,16 @@ venv-pack -o venv.tar.gz
 
 ```shell
 PYTHON_VENV='./venv/bin/python'
-PYSPARK_PYTHON=${PYTHON_VENV}
+export PYSPARK_PYTHON=${PYTHON_VENV}
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--archives ./venv.tar.gz#venv \
+src/data/yandex-example.py s3a://yl-otus/yandex-data.txt s3a://yl-otus/output
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+export PYSPARK_PYTHON=${PYTHON_VENV}
 spark-submit --master yarn --deploy-mode cluster \
 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV}\
 --num-executors 5 --executor-cores 5 \

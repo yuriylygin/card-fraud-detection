@@ -1,9 +1,8 @@
-import sys
-import click
-from pyspark import SparkConf, SparkContext
-
 
 def main():
+    import sys
+    import click
+    from pyspark import SparkConf, SparkContext
 
     if len(sys.argv) != 3:
         print('Usage job.py <input_dir> <output_dir>')
