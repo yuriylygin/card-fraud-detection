@@ -107,6 +107,7 @@ src/data/update-dataset.py
 yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
 --name=yc-manual-launch \
 --main-python-file-uri=s3a://yl-otus/yandex-example.py \
+--args=s3a://yl-otus/yandex-data.txt --args=s3a://yl-otus/output \
 --archive-uris=s3a://yl-otus/venv.tar.gz#venv \
 --properties=spark.yarn.appMasterEnv.PYSPARK_PYTHON=./venv/bin/python \
 --properties=spark.submit.deployMode=cluster
