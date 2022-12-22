@@ -137,5 +137,16 @@ yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
 ```
 
 ```shell
+spark-submit --master yarn --deploy-mode cluster \
+--files s3a://yl-otus/requirements.txt \
+--conf spark.pyspark.virtualenv.enabled=true  \
+--conf spark.pyspark.virtualenv.type=native \
+--conf spark.pyspark.virtualenv.requirements=./requirements.txt \
+--conf spark.pyspark.virtualenv.bin.path=/opt/conda/bin/virtualenv \
+--conf spark.pyspark.python=/usr/bin/python3 \
+s3a://yl-otus/cloudera.py
+```
+
+```shell
 yc dataproc job log --cluster-id=c9q1ee8pnj1r46ogk49s c9qslupu9ch0v2u33lrb
 ```
