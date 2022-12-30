@@ -89,6 +89,10 @@ python src/data/manage.py delete
 ```
 
 ```shell
+python3 -m virtualenv --copies venv
+```
+
+```shell
 venv-pack -o venv.tar.gz
 ```
 
@@ -99,6 +103,16 @@ spark-submit --master yarn --deploy-mode cluster \
 --conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
 --archives ./venv.tar.gz#venv \
 src/data/yandex-example.py s3a://yl-otus/yandex-data.txt s3a://yl-otus/output
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+export PYSPARK_PYTHON=${PYTHON_VENV}
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--conf spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON=${PYTHON_VENV} \
+--archives s3a://yl-otus/venv.tar.gz#venv \
+s3a://yl-otus/yandex-example.py s3a://yl-otus/yandex-data.txt s3a://yl-otus/output
 ```
 
 ```shell
@@ -126,7 +140,7 @@ yc dataproc job create-pyspark --cluster-id c9q1ee8pnj1r46ogk49s \
 ```
 
 ```shell
-yc dataproc job create-pyspark --cluster-id=c9q1ee8pnj1r46ogk49s \
+yc dataproc job create-pyspark --cluster-id=c9qe7r6747r6hidd2p05 \
 --name=yc-manual-launch \
 --main-python-file-uri ./card-fraud-detection.tar.gz/card-fraud-detection/src/data/yandex-example.py \
 --args s3a://yl-otus/yandex-data.txt --args s3a://yl-otus/output \
@@ -149,4 +163,30 @@ s3a://yl-otus/cloudera.py
 
 ```shell
 yc dataproc job log --cluster-id=c9q1ee8pnj1r46ogk49s c9qslupu9ch0v2u33lrb
+```
+
+worked
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--archives s3a://yl-otus/venv.tar.gz#venv s3a://yl-otus/cloudera.py
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+spark-submit --master yarn --deploy-mode client \
+--conf spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--archives s3a://yl-otus/venv.tar.gz#venv s3a://yl-otus/cloudera.py
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+yc dataproc job create-pyspark --cluster-id c9qe7r6747r6hidd2p05 \
+--name yc-manual-launch \
+--main-python-file-uri s3a://yl-otus/cloudera.py \
+--archive-uris s3a://yl-otus/venv.tar.gz#venv \
+--properties spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--properties spark.submit.deployMode=cluster
 ```
