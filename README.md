@@ -169,6 +169,37 @@ s3a://yl-otus/cloudera.py
 yc dataproc job log --cluster-id=c9q1ee8pnj1r46ogk49s c9qslupu9ch0v2u33lrb
 ```
 
+```shell
+PYTHON_VENV='./venv/bin/python'
+yc dataproc job create-pyspark --cluster-id c9q1ee8pnj1r46ogk49s \
+--name yc-manual-launch \
+--main-python-file-uri s3a://yl-otus/update.py \
+--args 30 --args 2022-01-01 --args 10 \
+--archive-uris s3a://yl-otus/venv.tar.gz#venv \
+--python-file-uris s3a://yl-otus/cfd.zip \
+--properties spark.pyspark.python=${PYTHON_VENV} \
+--properties spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--properties spark.submit.deployMode=client
+```
+
+```shell
+PYTHON_VENV='/home/ubuntu/card-fraud-detection/venv/bin/python'
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--py-files cfd.zip \
+--archives venv.tar.gz#venv \
+src/data/update.py 30 2022-01-01 10
+```
+
+```shell
+PYTHON_VENV='./venv/bin/python'
+spark-submit --master yarn --deploy-mode client \
+--conf spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--py-files cfd.zip \
+--archives venv.tar.gz#venv \
+src/data/update.py 30 2022-01-01 10
+```
+
 worked
 
 ```shell
