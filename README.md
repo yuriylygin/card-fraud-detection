@@ -97,6 +97,10 @@ venv-pack -o venv.tar.gz
 ```
 
 ```shell
+git archive --format zip --output cfd.zip main
+```
+
+```shell
 PYTHON_VENV='./venv/bin/python'
 export PYSPARK_PYTHON=${PYTHON_VENV}
 spark-submit --master yarn --deploy-mode cluster \
@@ -163,6 +167,33 @@ s3a://yl-otus/cloudera.py
 
 ```shell
 yc dataproc job log --cluster-id=c9q1ee8pnj1r46ogk49s c9qslupu9ch0v2u33lrb
+```
+
+```shell
+spark-submit --master yarn --deploy-mode client \ 
+--conf spark.executorEnv.PYSPARK_PYTHON='./venv/bin/python' \
+--archives venv.tar.gz#venv \
+--py-files cfd.zip \
+src/data/create.py 5000 10000 30 2022-01-01 10
+```
+
+```shell
+spark-submit --master yarn --deploy-mode client \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON='./venv/bin/python' \
+--conf spark.yarn.appMasterEnv.PYSPARK_DRIVER_PYTHON='./venv/bin/python' \
+--conf spark.executorEnv.PYSPARK_PYTHON='./venv/bin/python' \
+--archives venv.tar.gz#venv \
+--py-files cfd.zip \
+src/data/create.py 5000 10000 30 2022-01-01 10
+```
+
+```shell
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.yarn.appMasterEnv.PYSPARK_PYTHON='./venv/bin/python' \
+--conf spark.executorEnv.PYSPARK_PYTHON='./venv/bin/python' \
+--archives venv.tar.gz#venv \
+--py-files cfd.zip \
+src/data/create.py 5000 10000 30 2022-01-01 10
 ```
 
 worked

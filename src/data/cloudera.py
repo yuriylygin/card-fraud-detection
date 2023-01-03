@@ -1,5 +1,5 @@
 from pyspark import SparkConf, SparkContext
- 
+
     
 if __name__ == "__main__":
     sc = SparkContext(appName="Simple App")
