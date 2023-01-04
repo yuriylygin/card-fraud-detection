@@ -19,8 +19,7 @@ from airflow.operators.python_operator import PythonOperator
 
 logger = logging.getLogger("airflow.task")
 
-def preprocessing(scheduled_date, scheduled_time):
-    logger.info("=========================================")
+def catch_time(scheduled_date, scheduled_time):
     logger.info(scheduled_date)
     logger.info(scheduled_time)
 
@@ -40,9 +39,9 @@ with DAG(
     start_date=dt.datetime(2021, 2, 1),
     tags=["data collecting"],
 ) as dag:
-    preprocess = PythonOperator(
+    catch_time_task = PythonOperator(
         task_id="preprocess",
-        python_callable=preprocessing,
+        python_callable=catch_time,
         op_kwargs={"scheduled_date": "{{ ds }}", "scheduled_time": "{{ ts }}"},
     )
     create_pyspark_job = CustomDataprocCreatePysparkJobOperator(
@@ -74,4 +73,4 @@ with DAG(
         # exclude_packages=["com.amazonaws:amazon-kinesis-client"],
     )
 
-    preprocess >> create_pyspark_job
+    catch_time_task >> create_pyspark_job
