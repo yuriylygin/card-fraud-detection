@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import uuid
 import datetime as dt
+import logging
 
 from airflow import DAG
 from airflow.providers.yandex.operators.yandexcloud_dataproc import (
@@ -13,6 +14,20 @@ from airflow.providers.yandex.operators.yandexcloud_dataproc import (
     DataprocCreateSparkJobOperator,
     DataprocDeleteClusterOperator,
 )
+from airflow.operators.python_operator import PythonOperator
+
+
+logger = logging.getLogger("airflow.task")
+
+def preprocessing(scheduled_date, scheduled_time):
+    logger.info("=========================================")
+    logger.info(scheduled_date)
+    logger.info(scheduled_time)
+
+
+class CustomDataprocCreatePysparkJobOperator(DataprocCreatePysparkJobOperator):
+    template_fields = ['args']
+
 
 args = {
     "owner": "airflow",
@@ -21,12 +36,18 @@ args = {
 with DAG(
     dag_id="update-dataset",
     default_args=args,
-    schedule_interval="@once",
-    start_date=dt.datetime(2021, 1, 1),
-    tags=["API"],
+    schedule_interval="@monthly",
+    start_date=dt.datetime(2021, 2, 1),
+    tags=["data collecting"],
 ) as dag:
-    create_pyspark_job = DataprocCreatePysparkJobOperator(
-        task_id="create_pyspark_job",
+    preprocess = PythonOperator(
+        task_id="preprocess",
+        python_callable=preprocessing,
+        op_kwargs={"scheduled_date": "{{ ds }}", "scheduled_time": "{{ ts }}"},
+    )
+    create_pyspark_job = CustomDataprocCreatePysparkJobOperator(
+        depends_on_past=True,
+        task_id="update-dataset",
         cluster_id="c9qe7r6747r6hidd2p05",
         name="airflow-update",
         main_python_file_uri="s3a://yl-otus/update.py",
@@ -39,7 +60,7 @@ with DAG(
         # archive_uris=[
         #     "s3a://yl-otus/venv.zip",
         # ],
-        args=["30", "2022-01-01", "10"],
+        args=["15", "{{ ds }}", "10"],
         # jar_file_uris=[
         #     "s3a://data-proc-public/jobs/sources/java/dataproc-examples-1.0.jar",
         #     "s3a://data-proc-public/jobs/sources/java/icu4j-61.1.jar",
@@ -52,3 +73,5 @@ with DAG(
         # repositories=["https://repo1.maven.org/maven2"],
         # exclude_packages=["com.amazonaws:amazon-kinesis-client"],
     )
+
+    preprocess >> create_pyspark_job
