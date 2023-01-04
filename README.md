@@ -271,3 +271,23 @@ spark-submit --master yarn --deploy-mode cluster \
 --archives venv.tar.gz#venv \
 src/data/update.py 30 2022-01-01 10
 ```
+
+```shell
+PYTHON_VENV='/usr/bin/python3'
+spark-submit --master yarn --deploy-mode client \
+--conf spark.pyspark.python=${PYTHON_VENV} \
+--py-files cfd.zip \
+src/data/update.py 30 2022-01-01 10
+```
+
+```shell
+PYTHON='./venv/bin/python'
+yc dataproc job create-pyspark --cluster-id c9qe7r6747r6hidd2p05 \
+--name yc-update \
+--main-python-file-uri s3a://yl-otus/update.py \
+--args 30 --args 2022-01-01 --args 10 \
+--python-file-uris s3a://yl-otus/cfd.zip \
+--archive-uris s3a://yl-otus/venv.tar.gz#venv \
+--properties spark.executorEnv.PYSPARK_PYTHON=${PYTHON} \
+--properties spark.submit.deployMode=client
+```
