@@ -44,7 +44,7 @@ with DAG(
         python_callable=catch_time,
         op_kwargs={"scheduled_date": "{{ ds }}", "scheduled_time": "{{ ts }}"},
     )
-    create_pyspark_job = CustomDataprocCreatePysparkJobOperator(
+    update_dataset_task = CustomDataprocCreatePysparkJobOperator(
         depends_on_past=True,
         task_id="update-dataset",
         cluster_id="c9qe7r6747r6hidd2p05",
@@ -73,4 +73,4 @@ with DAG(
         # exclude_packages=["com.amazonaws:amazon-kinesis-client"],
     )
 
-    catch_time_task >> create_pyspark_job
+    catch_time_task >> update_dataset_task
