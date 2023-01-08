@@ -1,0 +1,3 @@
+pandarallel
+numpy
+pandas
