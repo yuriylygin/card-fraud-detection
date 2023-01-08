@@ -203,6 +203,22 @@ src/data/update.py 30 2022-01-01 10
 worked
 
 ```shell
+PYTHON_VENV='/home/ubuntu/cfd/bin/python'
+spark-submit --master yarn --deploy-mode client \
+--conf spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--py-files cfd.zip \
+src/data/update.py 30 2022-01-01 10
+```
+
+```shell
+PYTHON_VENV='/home/ubuntu/cfd/bin/python'
+spark-submit --master yarn --deploy-mode cluster \
+--conf spark.spark.yarn.appMasterEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
+--py-files cfd.zip \
+src/data/update.py 30 2022-01-01 10
+```
+
+```shell
 PYTHON_VENV='./venv/bin/python'
 spark-submit --master yarn --deploy-mode cluster \
 --conf spark.executorEnv.PYSPARK_PYTHON=${PYTHON_VENV} \
